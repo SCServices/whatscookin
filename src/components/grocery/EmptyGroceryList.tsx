@@ -1,22 +1,16 @@
 
+import { ShoppingBasket } from "lucide-react";
+
 export const EmptyGroceryList = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-full space-y-4 animate-fade-in">
-      <svg
-        className="w-24 h-24 text-muted-foreground/50"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1}
-          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-        />
-      </svg>
-      <p className="text-center text-muted-foreground">
-        Your list is empty. Add some items!
+    <div className="flex flex-col items-center justify-center p-8 text-center animate-fade-in">
+      <div className="relative mb-4">
+        <ShoppingBasket className="w-16 h-16 text-[#87CEEB]" />
+        <div className="absolute -bottom-2 w-16 h-2 bg-[#87CEEB]/20 blur-sm rounded-full" />
+      </div>
+      <h3 className="text-lg font-semibold mb-2">Your grocery list is empty</h3>
+      <p className="text-muted-foreground max-w-[300px]">
+        Start adding items to your list using the input field above. Your items will be saved automatically.
       </p>
     </div>
   );

@@ -1,7 +1,7 @@
 
-import { Button } from "@/components/ui/button";
-import GroceryList from "@/components/GroceryList";
+import { GroceryList } from "@/components/GroceryList";
 import GroceryBackground from "@/components/GroceryBackground";
+import { CreateNewListDialog } from "@/components/grocery/CreateNewListDialog";
 
 const Index = () => {
   return (
@@ -26,11 +26,7 @@ const Index = () => {
           
           {/* Quick Actions */}
           <div className="flex flex-wrap justify-center gap-4 mt-4">
-            <Button
-              className="bg-[#87CEEB] hover:bg-[#87CEEB]/80 transition-all duration-200 min-w-[48px] min-h-[48px] text-base"
-            >
-              Create New List
-            </Button>
+            <CreateNewListDialog />
           </div>
         </div>
       </main>
