@@ -4,17 +4,54 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Trash, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+
+interface GroceryItem {
+  id: string;
+  name: string;
+  completed: boolean;
+}
 
 const GroceryList = () => {
-  const [items, setItems] = React.useState<string[]>([]);
+  const [items, setItems] = React.useState<GroceryItem[]>([]);
   const [newItem, setNewItem] = React.useState("");
+  const { toast } = useToast();
 
   const addItem = () => {
     if (newItem.trim()) {
-      setItems([...items, newItem.trim()]);
+      const item: GroceryItem = {
+        id: crypto.randomUUID(),
+        name: newItem.trim(),
+        completed: false,
+      };
+      setItems([...items, item]);
       setNewItem("");
+      toast({
+        title: "Item added",
+        description: `${item.name} has been added to your list`,
+      });
     }
+  };
+
+  const deleteItem = (id: string) => {
+    const item = items.find((i) => i.id === id);
+    setItems(items.filter((item) => item.id !== id));
+    if (item) {
+      toast({
+        title: "Item removed",
+        description: `${item.name} has been removed from your list`,
+      });
+    }
+  };
+
+  const toggleItem = (id: string) => {
+    setItems(
+      items.map((item) =>
+        item.id === id ? { ...item, completed: !item.completed } : item
+      )
+    );
   };
 
   return (
@@ -50,13 +87,33 @@ const GroceryList = () => {
             <ul className="space-y-2">
               {items.map((item, index) => (
                 <li
-                  key={index}
+                  key={item.id}
                   className="group flex items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors duration-200 animate-fade-in"
                   style={{
                     animationDelay: `${index * 50}ms`,
                   }}
                 >
-                  <span className="text-lg flex-1">{item}</span>
+                  <Checkbox
+                    checked={item.completed}
+                    onCheckedChange={() => toggleItem(item.id)}
+                    className="h-5 w-5"
+                  />
+                  <span 
+                    className={`text-lg flex-1 ${
+                      item.completed ? "line-through text-muted-foreground" : ""
+                    }`}
+                  >
+                    {item.name}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteItem(item.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  >
+                    <Trash className="h-5 w-5 text-destructive" />
+                    <span className="sr-only">Delete {item.name}</span>
+                  </Button>
                 </li>
               ))}
             </ul>
