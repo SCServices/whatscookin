@@ -1,5 +1,5 @@
 
-import { GroceryList } from "@/components/GroceryList";
+import GroceryList from "@/components/GroceryList";
 import GroceryBackground from "@/components/GroceryBackground";
 import { CreateNewListDialog } from "@/components/grocery/CreateNewListDialog";
 

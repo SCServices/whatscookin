@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import useGroceryStore from "@/hooks/useGroceryStore";
+import { useGroceryStore } from "@/hooks/useGroceryStore";
 import { Plus } from "lucide-react";
 
 export function CreateNewListDialog() {

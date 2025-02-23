@@ -86,12 +86,8 @@ export const useGroceryStore = () => {
     );
   };
 
-  const clearList = () => {
+  const clearItems = () => {
     setItems([]);
-    toast({
-      title: "List cleared",
-      description: "All items have been removed from your list",
-    });
   };
 
   return {
@@ -100,6 +96,6 @@ export const useGroceryStore = () => {
     addItem,
     deleteItem,
     toggleItem,
-    clearList,
+    clearItems,
   };
 };
