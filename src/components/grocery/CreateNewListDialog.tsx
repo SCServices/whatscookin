@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useGroceryStore } from "@/hooks/useGroceryStore";
@@ -15,7 +16,7 @@ import { Plus } from "lucide-react";
 
 export function CreateNewListDialog() {
   const { toast } = useToast();
-  const clearItems = useGroceryStore((state) => state.clearItems);
+  const { clearItems } = useGroceryStore();
 
   const handleCreateNewList = () => {
     clearItems();
@@ -44,16 +45,20 @@ export function CreateNewListDialog() {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" type="button">
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            onClick={handleCreateNewList}
-            className="bg-[#87CEEB] hover:bg-[#87CEEB]/80"
-          >
-            Create New List
-          </Button>
+          <DialogClose asChild>
+            <Button variant="outline" type="button">
+              Cancel
+            </Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              onClick={handleCreateNewList}
+              className="bg-[#87CEEB] hover:bg-[#87CEEB]/80"
+            >
+              Create New List
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

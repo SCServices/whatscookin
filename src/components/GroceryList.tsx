@@ -11,7 +11,7 @@ import { GroceryItem } from "./grocery/GroceryItem";
 import { useGroceryStore } from "@/hooks/useGroceryStore";
 
 const GroceryList = () => {
-  const { items, isLoading, addItem, deleteItem, toggleItem, clearList } = useGroceryStore();
+  const { items, isLoading, addItem, deleteItem, toggleItem, clearItems } = useGroceryStore();
   const [newItem, setNewItem] = useState("");
 
   const handleAddItem = () => {
@@ -53,7 +53,7 @@ const GroceryList = () => {
             <EmptyGroceryList />
           ) : (
             <ul className="space-y-2">
-              {items.map((item, index) => (
+              {items.map((item) => (
                 <GroceryItem
                   key={item.id}
                   item={item}
@@ -69,7 +69,7 @@ const GroceryList = () => {
           <div className="mt-4 flex justify-end">
             <Button
               variant="outline"
-              onClick={clearList}
+              onClick={clearItems}
               className="text-destructive hover:text-destructive"
             >
               Clear List
