@@ -35,43 +35,46 @@ const GroceryBackground = () => {
       0xFFA07A  // Light salmon
     ];
 
-    // Create multiple floating items
-    for (let i = 0; i < 15; i++) {
+    // Create multiple floating items with larger size and more spread out
+    for (let i = 0; i < 20; i++) {
       const geometry = geometries[Math.floor(Math.random() * geometries.length)];
       const material = new THREE.MeshPhongMaterial({
         color: colors[Math.floor(Math.random() * colors.length)],
         transparent: true,
-        opacity: 0.5
+        opacity: 0.7 // Increased opacity
       });
       const item = new THREE.Mesh(geometry, material);
 
-      // Random positions
-      item.position.x = Math.random() * 20 - 10;
-      item.position.y = Math.random() * 20 - 10;
-      item.position.z = Math.random() * 20 - 15;
+      // More spread out positions
+      item.position.x = Math.random() * 30 - 15;
+      item.position.y = Math.random() * 30 - 15;
+      item.position.z = Math.random() * 30 - 20;
+
+      // Make items larger
+      item.scale.set(2, 2, 2);
 
       items.push(item);
       scene.add(item);
     }
 
-    // Add lights
-    const ambientLight = new THREE.AmbientLight(0x404040);
+    // Stronger lights
+    const ambientLight = new THREE.AmbientLight(0x404040, 2); // Increased intensity
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // Increased intensity
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
 
-    camera.position.z = 5;
+    camera.position.z = 15; // Moved camera back
 
-    // Animation
+    // Enhanced animation
     const animate = () => {
       requestAnimationFrame(animate);
 
       items.forEach((item) => {
-        item.rotation.x += 0.001;
-        item.rotation.y += 0.001;
-        item.position.y += Math.sin(Date.now() * 0.001) * 0.002;
+        item.rotation.x += 0.005; // Increased rotation speed
+        item.rotation.y += 0.005;
+        item.position.y += Math.sin(Date.now() * 0.001) * 0.05; // Increased floating movement
       });
 
       renderer.render(scene, camera);
@@ -111,7 +114,7 @@ const GroceryBackground = () => {
         width: '100%',
         height: '100%',
         zIndex: -1,
-        opacity: 0.3,
+        opacity: 0.5, // Increased opacity
       }}
     />
   );
