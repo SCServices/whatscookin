@@ -20,7 +20,6 @@ interface FirecrawlConfig {
   apiKey: string;
   defaultScrapeOptions: {
     formats: FirecrawlFormat[];
-    cssSelector?: string;
   };
   maxRetries: number;
   retryDelay: number;
@@ -32,8 +31,7 @@ export class FirecrawlService {
   private static config: FirecrawlConfig = {
     apiKey: '',
     defaultScrapeOptions: {
-      formats: ['markdown', 'html'],
-      cssSelector: 'article, main, .recipe-content, .ingredients'
+      formats: ['markdown', 'html']
     },
     maxRetries: 3,
     retryDelay: 1000
@@ -84,8 +82,7 @@ export class FirecrawlService {
         const result = await instance.crawlUrl(url, {
           limit: 1,
           scrapeOptions: {
-            formats: this.config.defaultScrapeOptions.formats,
-            cssSelector: this.config.defaultScrapeOptions.cssSelector
+            formats: this.config.defaultScrapeOptions.formats
           }
         });
 
