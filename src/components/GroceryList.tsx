@@ -8,14 +8,24 @@ import { Plus } from "lucide-react";
 import { GroceryListLoading } from "./grocery/GroceryListLoading";
 import { EmptyGroceryList } from "./grocery/EmptyGroceryList";
 import { GroceryItem } from "./grocery/GroceryItem";
-import { useGroceryStore } from "@/hooks/useGroceryStore";
+import { useGroceryLists } from "@/hooks/useGroceryLists";
 
 const GroceryList = () => {
-  const { items, isLoading, addItem, deleteItem, toggleItem, clearItems } = useGroceryStore();
+  const { 
+    isLoading,
+    activeListId,
+    getActiveList,
+    addItemToList,
+    deleteItemFromList,
+    toggleItemInList,
+    clearList,
+  } = useGroceryLists();
   const [newItem, setNewItem] = useState("");
 
+  const activeList = getActiveList();
+
   const handleAddItem = () => {
-    if (addItem(newItem)) {
+    if (activeListId && addItemToList(activeListId, newItem)) {
       setNewItem("");
     }
   };
@@ -24,10 +34,14 @@ const GroceryList = () => {
     return <GroceryListLoading />;
   }
 
+  if (!activeList) {
+    return null;
+  }
+
   return (
     <Card className="w-full max-w-md mx-auto animate-fade-in">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">My Grocery List</CardTitle>
+        <CardTitle className="text-2xl font-bold">{activeList.name}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex gap-2 mb-4">
@@ -49,27 +63,27 @@ const GroceryList = () => {
         </div>
         
         <ScrollArea className="h-[50vh] w-full rounded-md border p-4">
-          {items.length === 0 ? (
+          {activeList.items.length === 0 ? (
             <EmptyGroceryList />
           ) : (
             <ul className="space-y-2">
-              {items.map((item) => (
+              {activeList.items.map((item) => (
                 <GroceryItem
                   key={item.id}
                   item={item}
-                  onToggle={toggleItem}
-                  onDelete={deleteItem}
+                  onToggle={() => toggleItemInList(activeList.id, item.id)}
+                  onDelete={() => deleteItemFromList(activeList.id, item.id)}
                 />
               ))}
             </ul>
           )}
         </ScrollArea>
         
-        {items.length > 0 && (
+        {activeList.items.length > 0 && (
           <div className="mt-4 flex justify-end">
             <Button
               variant="outline"
-              onClick={clearItems}
+              onClick={() => clearList(activeList.id)}
               className="text-destructive hover:text-destructive"
             >
               Clear List
