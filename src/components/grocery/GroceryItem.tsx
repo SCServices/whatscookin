@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash } from "lucide-react";
 import { useState } from "react";
 import type { GroceryItem as GroceryItemType, UnitType } from "@/types/grocery";
+import { GroceryItemModel } from "./GroceryItemModel";
 
 interface GroceryItemProps {
   item: GroceryItemType;
@@ -50,14 +51,17 @@ export const GroceryItem = ({
       />
       
       <div className="flex-1 flex items-center gap-2">
-        <span
-          className={`text-lg flex-1 ${
-            item.completed ? "line-through text-muted-foreground" : ""
-          }`}
-          onClick={() => setIsEditing(true)}
-        >
-          {item.name}
-        </span>
+        <div className="flex items-center gap-2">
+          <GroceryItemModel item={item} />
+          <span
+            className={`text-lg flex-1 ${
+              item.completed ? "line-through text-muted-foreground" : ""
+            }`}
+            onClick={() => setIsEditing(true)}
+          >
+            {item.name}
+          </span>
+        </div>
         
         <div className="flex items-center gap-2">
           <Input
@@ -96,4 +100,3 @@ export const GroceryItem = ({
     </li>
   );
 };
-
