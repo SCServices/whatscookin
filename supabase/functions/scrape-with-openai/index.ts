@@ -36,6 +36,17 @@ function cleanHtml(html: string): string {
   return cleaned;
 }
 
+// Function to extract JSON from markdown-formatted string
+function extractJsonFromMarkdown(markdownString: string): string {
+  // Remove markdown code block syntax and any surrounding whitespace
+  const jsonMatch = markdownString.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+  if (jsonMatch && jsonMatch[1]) {
+    return jsonMatch[1];
+  }
+  // If no markdown format is found, return the original string
+  return markdownString;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -97,8 +108,12 @@ serve(async (req) => {
       throw new Error('Invalid response from OpenAI');
     }
 
-    // Parse the response content which should be a JSON string
-    const parsedContent = JSON.parse(aiResponse.choices[0].message.content);
+    // Clean up the response content before parsing
+    const cleanedContent = extractJsonFromMarkdown(aiResponse.choices[0].message.content);
+    console.log('Cleaned content:', cleanedContent);
+
+    // Parse the cleaned content
+    const parsedContent = JSON.parse(cleanedContent);
     console.log('Parsed content:', parsedContent);
 
     return new Response(
