@@ -19,19 +19,20 @@ interface FirecrawlConfig {
   apiKey: string;
   defaultScrapeOptions: {
     formats: FirecrawlFormat[];
-    cssSelector: string;
+    selector: string;
   };
   maxRetries: number;
   retryDelay: number;
 }
 
 export class FirecrawlService {
+  private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
   private static instance: FirecrawlApp | null = null;
   private static config: FirecrawlConfig = {
     apiKey: '',
     defaultScrapeOptions: {
       formats: ['markdown', 'html'],
-      cssSelector: 'article, main, .recipe-content, .ingredients'
+      selector: 'article, main, .recipe-content, .ingredients'
     },
     maxRetries: 3,
     retryDelay: 1000
@@ -39,14 +40,24 @@ export class FirecrawlService {
 
   private static async getInstance(): Promise<FirecrawlApp> {
     if (!this.instance) {
-      // Get the API key from Supabase secrets (it will be injected into the edge function)
-      const apiKey = process.env.FIRECRAWL_API_KEY;
+      const apiKey = this.getApiKey();
       if (!apiKey) {
-        throw new Error('Firecrawl API key not found in environment variables.');
+        throw new Error('API key not found. Please set your Firecrawl API key.');
       }
       this.instance = new FirecrawlApp({ apiKey });
     }
     return this.instance;
+  }
+
+  static saveApiKey(apiKey: string): void {
+    localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
+    // Reset instance to force new initialization with new API key
+    this.instance = null;
+    this.config.apiKey = apiKey;
+  }
+
+  static getApiKey(): string | null {
+    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
   }
 
   private static async retry<T>(
@@ -73,7 +84,7 @@ export class FirecrawlService {
           limit: 1,
           scrapeOptions: {
             formats: this.config.defaultScrapeOptions.formats,
-            cssSelector: this.config.defaultScrapeOptions.cssSelector
+            selector: this.config.defaultScrapeOptions.selector
           }
         });
 
