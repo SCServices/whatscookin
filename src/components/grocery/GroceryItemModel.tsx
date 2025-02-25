@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { GroceryItemType } from '@/types/grocery';
+import type { GroceryItem } from '@/types/grocery';
 
 // Common grocery items and their corresponding 3D model configurations
 const GROCERY_MODELS: Record<string, {
@@ -28,7 +28,7 @@ const GROCERY_MODELS: Record<string, {
 };
 
 interface GroceryItemModelProps {
-  item: GroceryItemType;
+  item: GroceryItem;
 }
 
 export const GroceryItemModel: React.FC<GroceryItemModelProps> = ({ item }) => {
@@ -101,7 +101,7 @@ export const GroceryItemModel: React.FC<GroceryItemModelProps> = ({ item }) => {
   return (
     <div 
       ref={mountRef} 
-      className="w-12 h-12 inline 'block mr-2"
+      className="w-12 h-12 inline-block mr-2"
       onMouseEnter={() => {
         if (meshRef.current) {
           meshRef.current.scale.multiplyScalar(1.2);
