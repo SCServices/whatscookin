@@ -14,8 +14,11 @@ export const useItemOperations = (
     quantity: number = 1, 
     unit: string = 'piece'
   ): boolean => {
+    console.log('Inside addItemToList:', { listId, name, quantity, unit });
+    
     const list = lists.find(l => l.id === listId);
     if (!list) {
+      console.error('List not found:', listId);
       toast({
         title: "Error",
         description: "List not found",
@@ -25,6 +28,7 @@ export const useItemOperations = (
     }
 
     if (!name || name.trim().length < 2) {
+      console.error('Invalid item name:', name);
       toast({
         title: "Cannot Add Item",
         description: "Item name must be at least 2 characters",
@@ -44,6 +48,8 @@ export const useItemOperations = (
     if (existingItem) {
       // Update quantity instead of adding new item
       const updatedQuantity = existingItem.quantity + quantity;
+      console.log('Updating existing item quantity:', { name: normalizedName, oldQuantity: existingItem.quantity, newQuantity: updatedQuantity });
+      
       setLists(lists.map(l => 
         l.id === listId 
           ? {
@@ -65,6 +71,7 @@ export const useItemOperations = (
     }
 
     if (quantity <= 0) {
+      console.error('Invalid quantity:', quantity);
       toast({
         title: "Cannot Add Item",
         description: "Quantity must be greater than 0",
@@ -80,6 +87,8 @@ export const useItemOperations = (
       quantity,
       unit,
     };
+
+    console.log('Adding new item to list:', newItem);
 
     setLists(lists.map(l => 
       l.id === listId 
@@ -222,4 +231,3 @@ export const useItemOperations = (
     clearList,
   };
 };
-

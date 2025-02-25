@@ -40,6 +40,7 @@ export const RecipeUrlForm = ({ onIngredientsExtracted }: RecipeUrlFormProps) =>
         throw new Error('No ingredients found in the recipe');
       }
 
+      console.log('Before calling onIngredientsExtracted in RecipeUrlForm:', ingredients);
       onIngredientsExtracted(ingredients);
       toast({
         title: "Success",

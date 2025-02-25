@@ -35,7 +35,9 @@ const GroceryList = () => {
   const handleIngredientsExtracted = (ingredients: Array<{ name: string; quantity: number; unit: string }>) => {
     if (!activeListId) return;
     
+    console.log('Inside handleIngredientsExtracted in GroceryList:', ingredients);
     ingredients.forEach(ingredient => {
+      console.log('Adding ingredient to list:', ingredient);
       addItemToList(activeListId, ingredient.name, ingredient.quantity, ingredient.unit);
     });
   };
