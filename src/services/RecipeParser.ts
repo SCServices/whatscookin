@@ -21,12 +21,20 @@ export class RecipeParser {
         throw new Error(error.message);
       }
 
-      if (!data?.ingredients) {
-        throw new Error('No ingredients found in the recipe');
+      if (!data?.ingredients || !Array.isArray(data.ingredients)) {
+        console.error('Invalid response format:', data);
+        throw new Error('Invalid ingredients data returned from parser');
       }
 
-      console.log('Parsed ingredients:', data.ingredients);
-      return data.ingredients;
+      // Validate and normalize each ingredient
+      const ingredients = data.ingredients.map(item => ({
+        name: String(item.name).toLowerCase().trim(),
+        quantity: Number(item.quantity) || 1,
+        unit: String(item.unit).toLowerCase().trim() || 'piece'
+      }));
+
+      console.log('Successfully parsed ingredients:', ingredients);
+      return ingredients;
     } catch (error) {
       console.error('Error parsing recipe:', error);
       throw error;
