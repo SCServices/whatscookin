@@ -3,6 +3,8 @@ export interface GroceryItem {
   id: string;
   name: string;
   completed: boolean;
+  quantity: number;
+  unit: string;
 }
 
 export interface GroceryList {
@@ -15,4 +17,17 @@ export interface GroceryList {
 }
 
 export type ListOperation = 'create' | 'rename' | 'delete' | 'share';
+
+export type UnitType = 
+  | 'piece' 
+  | 'kg' 
+  | 'g' 
+  | 'lb' 
+  | 'oz' 
+  | 'l' 
+  | 'ml' 
+  | 'cup' 
+  | 'tbsp' 
+  | 'tsp'
+  | 'dozen';
 

@@ -19,6 +19,7 @@ const GroceryList = () => {
     deleteItemFromList,
     toggleItemInList,
     clearList,
+    updateItemQuantity,
   } = useGroceryLists();
   const [newItem, setNewItem] = useState("");
 
@@ -73,6 +74,9 @@ const GroceryList = () => {
                   item={item}
                   onToggle={() => toggleItemInList(activeList.id, item.id)}
                   onDelete={() => deleteItemFromList(activeList.id, item.id)}
+                  onUpdateQuantity={(itemId, quantity, unit) => 
+                    updateItemQuantity(activeList.id, itemId, quantity, unit)
+                  }
                 />
               ))}
             </ul>
@@ -96,3 +100,4 @@ const GroceryList = () => {
 };
 
 export default GroceryList;
+

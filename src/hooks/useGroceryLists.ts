@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useListStorage } from "./useListStorage";
@@ -124,7 +123,12 @@ export const useGroceryLists = () => {
     return lists.find(list => list.id === activeListId) || null;
   };
 
-  const addItemToList = (listId: string, name: string): boolean => {
+  const addItemToList = (
+    listId: string, 
+    name: string, 
+    quantity: number = 1, 
+    unit: string = 'piece'
+  ): boolean => {
     const list = lists.find(l => l.id === listId);
     if (!list) {
       toast({
@@ -153,10 +157,21 @@ export const useGroceryLists = () => {
       return false;
     }
 
+    if (quantity <= 0) {
+      toast({
+        title: "Cannot Add Item",
+        description: "Quantity must be greater than 0",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     const newItem: GroceryItem = {
       id: crypto.randomUUID(),
       name: name.trim(),
       completed: false,
+      quantity,
+      unit,
     };
 
     setLists(lists.map(l => 
@@ -167,7 +182,7 @@ export const useGroceryLists = () => {
 
     toast({
       title: "Item Added",
-      description: `${newItem.name} has been added to ${list.name}`,
+      description: `${newItem.quantity} ${newItem.unit}${newItem.quantity > 1 && newItem.unit === 'piece' ? 's' : ''} of ${newItem.name} added to ${list.name}`,
     });
     return true;
   };
@@ -259,6 +274,39 @@ export const useGroceryLists = () => {
     });
   };
 
+  const updateItemQuantity = (listId: string, itemId: string, quantity: number, unit: string) => {
+    const list = lists.find(l => l.id === listId);
+    if (!list) {
+      toast({
+        title: "Error",
+        description: "List not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (quantity <= 0) {
+      toast({
+        title: "Invalid Quantity",
+        description: "Quantity must be greater than 0",
+      });
+      return;
+    }
+
+    setLists(lists.map(l => 
+      l.id === listId
+        ? {
+            ...l,
+            items: l.items.map(item =>
+              item.id === itemId 
+                ? { ...item, quantity, unit }
+                : item
+            ),
+          }
+        : l
+    ));
+  };
+
   return {
     lists,
     activeListId,
@@ -275,5 +323,6 @@ export const useGroceryLists = () => {
     toggleItemInList,
     deleteItemFromList,
     clearList,
+    updateItemQuantity,
   };
 };
