@@ -39,7 +39,7 @@ export class FirecrawlService {
         limit: 1,
         scrapeOptions: {
           formats: ['markdown', 'html'],
-          elements: ['article', 'main', '.recipe-content', '.ingredients']
+          selectors: ['article', 'main', '.recipe-content', '.ingredients']
         }
       });
 
