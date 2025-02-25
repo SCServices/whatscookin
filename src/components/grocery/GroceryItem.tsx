@@ -43,18 +43,20 @@ export const GroceryItem = ({
   ];
 
   return (
-    <li className="group flex items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors duration-200 animate-fade-in">
-      <Checkbox
-        checked={item.completed}
-        onCheckedChange={() => onToggle(item.id)}
-        className="h-5 w-5"
-      />
+    <li className="group flex flex-wrap sm:flex-nowrap items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors duration-200 animate-fade-in">
+      <div className="flex items-center gap-2 min-w-[24px]">
+        <Checkbox
+          checked={item.completed}
+          onCheckedChange={() => onToggle(item.id)}
+          className="h-5 w-5"
+        />
+      </div>
       
-      <div className="flex-1 flex items-center gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
+        <div className="flex items-center gap-2 min-w-[200px]">
           <GroceryItemModel item={item} />
           <span
-            className={`text-lg flex-1 ${
+            className={`text-lg truncate ${
               item.completed ? "line-through text-muted-foreground" : ""
             }`}
             onClick={() => setIsEditing(true)}
@@ -63,7 +65,7 @@ export const GroceryItem = ({
           </span>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto">
           <Input
             type="number"
             value={quantity}
@@ -92,7 +94,7 @@ export const GroceryItem = ({
         variant="ghost"
         size="icon"
         onClick={() => onDelete(item.id)}
-        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        className="opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0"
       >
         <Trash className="h-5 w-5 text-destructive" />
         <span className="sr-only">Delete {item.name}</span>
