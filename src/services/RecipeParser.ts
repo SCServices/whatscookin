@@ -26,45 +26,43 @@ export class RecipeParser {
         throw new Error('Invalid ingredients data returned from parser');
       }
 
-      // Create a map to combine ingredients with the same name but different units
-      const ingredientMap = new Map<string, Ingredient[]>();
+      // First, normalize all ingredients
+      const normalizedIngredients = data.ingredients.map(item => ({
+        name: String(item.name).toLowerCase().trim(),
+        quantity: Number(item.quantity) || 1,
+        unit: String(item.unit).toLowerCase().trim() || 'piece'
+      }));
+
+      // Group ingredients by name and unit
+      const groupedIngredients = new Map<string, Map<string, number>>();
       
-      data.ingredients.forEach(item => {
-        const name = String(item.name).toLowerCase().trim();
-        const quantity = Number(item.quantity) || 1;
-        const unit = String(item.unit).toLowerCase().trim() || 'piece';
-        
-        if (!ingredientMap.has(name)) {
-          ingredientMap.set(name, []);
+      normalizedIngredients.forEach(item => {
+        if (!groupedIngredients.has(item.name)) {
+          groupedIngredients.set(item.name, new Map());
         }
-        ingredientMap.get(name)?.push({ name, quantity, unit });
+        const unitMap = groupedIngredients.get(item.name)!;
+        const currentQty = unitMap.get(item.unit) || 0;
+        unitMap.set(item.unit, currentQty + item.quantity);
       });
 
-      // Convert the map back to an array, combining quantities for same units
-      const ingredients: Ingredient[] = [];
-      ingredientMap.forEach((items) => {
-        // Group by unit
-        const unitGroups = new Map<string, number>();
-        items.forEach(item => {
-          const currentQty = unitGroups.get(item.unit) || 0;
-          unitGroups.set(item.unit, currentQty + item.quantity);
-        });
-        
-        // Create separate ingredients for different units
-        unitGroups.forEach((quantity, unit) => {
-          ingredients.push({
-            name: items[0].name,
+      // Convert back to array format
+      const finalIngredients: Ingredient[] = [];
+      groupedIngredients.forEach((unitMap, name) => {
+        unitMap.forEach((quantity, unit) => {
+          finalIngredients.push({
+            name,
             quantity,
             unit
           });
         });
       });
 
-      console.log('Successfully parsed ingredients:', ingredients);
-      return ingredients;
+      console.log('Successfully parsed ingredients:', finalIngredients);
+      return finalIngredients;
     } catch (error) {
       console.error('Error parsing recipe:', error);
       throw error;
     }
   }
 }
+
