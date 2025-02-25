@@ -1,6 +1,7 @@
 
 import FirecrawlApp from '@mendable/firecrawl-js';
 
+// Define strict types for all possible responses and configurations
 interface CrawlResult {
   success: boolean;
   error?: string;
@@ -11,40 +12,91 @@ interface CrawlResult {
   };
 }
 
+interface FirecrawlConfig {
+  apiKey: string;
+  defaultScrapeOptions: {
+    formats: string[];
+    selectors: string[];
+  };
+  maxRetries: number;
+  retryDelay: number;
+}
+
 export class FirecrawlService {
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
-  private static firecrawlApp: FirecrawlApp | null = null;
+  private static instance: FirecrawlApp | null = null;
+  private static config: FirecrawlConfig = {
+    apiKey: '',
+    defaultScrapeOptions: {
+      formats: ['markdown', 'html'],
+      selectors: ['article', 'main', '.recipe-content', '.ingredients']
+    },
+    maxRetries: 3,
+    retryDelay: 1000
+  };
+
+  private static async getInstance(): Promise<FirecrawlApp> {
+    if (!this.instance) {
+      const apiKey = this.getApiKey();
+      if (!apiKey) {
+        throw new Error('API key not found. Please set your Firecrawl API key.');
+      }
+      this.instance = new FirecrawlApp({ apiKey });
+    }
+    return this.instance;
+  }
 
   static saveApiKey(apiKey: string): void {
     localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
-    this.firecrawlApp = new FirecrawlApp({ apiKey });
+    // Reset instance to force new initialization with new API key
+    this.instance = null;
+    this.config.apiKey = apiKey;
   }
 
   static getApiKey(): string | null {
     return localStorage.getItem(this.API_KEY_STORAGE_KEY);
   }
 
-  static async crawlWebsite(url: string): Promise<CrawlResult> {
-    const apiKey = this.getApiKey();
-    if (!apiKey) {
-      return { success: false, error: 'API key not found. Please set your Firecrawl API key.' };
-    }
-
+  private static async retry<T>(
+    operation: () => Promise<T>,
+    retries = this.config.maxRetries
+  ): Promise<T> {
     try {
-      if (!this.firecrawlApp) {
-        this.firecrawlApp = new FirecrawlApp({ apiKey });
+      return await operation();
+    } catch (error) {
+      if (retries > 0) {
+        await new Promise(resolve => setTimeout(resolve, this.config.retryDelay));
+        return this.retry(operation, retries - 1);
       }
+      throw error;
+    }
+  }
 
-      const response = await this.firecrawlApp.crawlUrl(url, {
-        limit: 1,
-        scrapeOptions: {
-          formats: ['markdown', 'html'],
-          elements: ['article', 'main', '.recipe-content', '.ingredients']
+  static async crawlWebsite(url: string): Promise<CrawlResult> {
+    try {
+      const instance = await this.getInstance();
+      
+      const response = await this.retry(async () => {
+        const result = await instance.crawlUrl(url, {
+          limit: 1,
+          scrapeOptions: {
+            formats: this.config.defaultScrapeOptions.formats,
+            selectors: this.config.defaultScrapeOptions.selectors
+          }
+        });
+
+        if (!result.success) {
+          throw new Error('Failed to crawl recipe website');
         }
+
+        return result;
       });
 
-      if (!response.success) {
-        return { success: false, error: 'Failed to crawl recipe website' };
+      if (!response.data?.[0]) {
+        return { 
+          success: false, 
+          error: 'No content found on the specified URL' 
+        };
       }
 
       return {
@@ -55,6 +107,7 @@ export class FirecrawlService {
           url: url
         }
       };
+
     } catch (error) {
       console.error('Error crawling website:', error);
       return {
@@ -62,5 +115,17 @@ export class FirecrawlService {
         error: error instanceof Error ? error.message : 'Failed to connect to Firecrawl API'
       };
     }
+  }
+
+  // Method to update default configuration
+  static updateConfig(newConfig: Partial<FirecrawlConfig>): void {
+    this.config = {
+      ...this.config,
+      ...newConfig,
+      defaultScrapeOptions: {
+        ...this.config.defaultScrapeOptions,
+        ...newConfig.defaultScrapeOptions
+      }
+    };
   }
 }
