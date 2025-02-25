@@ -14,13 +14,11 @@ interface CrawlResult {
   };
 }
 
-// Update our internal configuration type
 interface FirecrawlConfig {
   apiKey: string;
   defaultScrapeOptions: {
     formats: FirecrawlFormat[];
-    selector?: string; // Store as a single selector string
-    contentSelectors?: string[]; // Keep array version for our internal use
+    selector: string; // Updated to use 'selector' which is the correct parameter according to docs
   };
   maxRetries: number;
   retryDelay: number;
@@ -33,8 +31,7 @@ export class FirecrawlService {
     apiKey: '',
     defaultScrapeOptions: {
       formats: ['markdown', 'html'],
-      selector: 'article, main, .recipe-content, .ingredients',
-      contentSelectors: ['article', 'main', '.recipe-content', '.ingredients']
+      selector: 'article, main, .recipe-content, .ingredients' // CSS selectors as a comma-separated string
     },
     maxRetries: 3,
     retryDelay: 1000
@@ -51,9 +48,15 @@ export class FirecrawlService {
     return this.instance;
   }
 
+  static saveApiKey(apiKey: string): void {
+    localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
+    // Reset instance to force new initialization with new API key
+    this.instance = null;
+    this.config.apiKey = apiKey;
+  }
+
   static getApiKey(): string | null {
-    // First try to get from environment, then fallback to localStorage
-    return this.config.apiKey || localStorage.getItem(this.API_KEY_STORAGE_KEY);
+    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
   }
 
   private static async retry<T>(
@@ -80,7 +83,7 @@ export class FirecrawlService {
           limit: 1,
           scrapeOptions: {
             formats: this.config.defaultScrapeOptions.formats,
-            selector: this.config.defaultScrapeOptions.selector
+            selector: this.config.defaultScrapeOptions.selector // Using 'selector' as per the documentation
           }
         });
 
