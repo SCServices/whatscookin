@@ -1,6 +1,9 @@
 
 import FirecrawlApp from '@mendable/firecrawl-js';
 
+// Define the allowed format types
+type FirecrawlFormat = 'markdown' | 'html' | 'rawHtml' | 'content' | 'links' | 'screenshot' | 'screenshot@fullPage' | 'extract' | 'json';
+
 // Define strict types for all possible responses and configurations
 interface CrawlResult {
   success: boolean;
@@ -15,7 +18,7 @@ interface CrawlResult {
 interface FirecrawlConfig {
   apiKey: string;
   defaultScrapeOptions: {
-    formats: string[];
+    formats: FirecrawlFormat[];
     selectors: string[];
   };
   maxRetries: number;
