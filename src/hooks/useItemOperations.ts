@@ -8,12 +8,13 @@ export const useItemOperations = (
   lists: GroceryList[],
   setLists: (lists: GroceryList[]) => void
 ) => {
-  const { addItemToList } = useAddItem(lists, setLists);
+  const { addItemToList, addItemsToList } = useAddItem(lists, setLists);
   const { toggleItemInList, deleteItemFromList } = useItemModification(lists, setLists);
   const { updateItemQuantity, clearList } = useListUpdate(lists, setLists);
 
   return {
     addItemToList,
+    addItemsToList,
     toggleItemInList,
     deleteItemFromList,
     updateItemQuantity,

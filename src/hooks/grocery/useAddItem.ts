@@ -8,6 +8,76 @@ export const useAddItem = (
 ) => {
   const { toast } = useToast();
 
+  const addItemsToList = (
+    listId: string,
+    items: Array<{ name: string; quantity: number; unit: string }>
+  ): boolean => {
+    console.log('Inside addItemsToList:', { listId, items });
+    
+    const list = lists.find(l => l.id === listId);
+    if (!list) {
+      console.error('List not found:', listId);
+      toast({
+        title: "Error",
+        description: "List not found",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    const normalizedItems = items.map(item => ({
+      name: item.name.trim().toLowerCase(),
+      quantity: item.quantity,
+      unit: item.unit.toLowerCase(),
+    }));
+
+    // Group items by name and unit
+    const groupedItems = normalizedItems.reduce((acc, item) => {
+      const key = `${item.name}-${item.unit}`;
+      if (!acc[key]) {
+        acc[key] = { ...item, quantity: 0 };
+      }
+      acc[key].quantity += item.quantity;
+      return acc;
+    }, {} as Record<string, { name: string; quantity: number; unit: string }>);
+
+    // Update existing items and prepare new items
+    const existingItems = [...list.items];
+    const newItems: GroceryItem[] = [];
+
+    Object.values(groupedItems).forEach(item => {
+      const existingItem = existingItems.find(existing => 
+        existing.name === item.name && 
+        existing.unit === item.unit
+      );
+
+      if (existingItem) {
+        existingItem.quantity += item.quantity;
+      } else {
+        newItems.push({
+          id: crypto.randomUUID(),
+          name: item.name,
+          completed: false,
+          quantity: item.quantity,
+          unit: item.unit,
+        });
+      }
+    });
+
+    setLists(lists.map(l => 
+      l.id === listId 
+        ? { ...l, items: [...existingItems, ...newItems] }
+        : l
+    ));
+
+    const totalItems = Object.keys(groupedItems).length;
+    toast({
+      title: "Items Added",
+      description: `Added ${totalItems} ingredient${totalItems > 1 ? 's' : ''} to ${list.name}`,
+    });
+    return true;
+  };
+
   const addItemToList = (
     listId: string, 
     name: string, 
@@ -103,5 +173,5 @@ export const useAddItem = (
     return true;
   };
 
-  return { addItemToList };
+  return { addItemToList, addItemsToList };
 };

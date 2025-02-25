@@ -17,6 +17,7 @@ const GroceryList = () => {
     activeListId,
     getActiveList,
     addItemToList,
+    addItemsToList,
     deleteItemFromList,
     toggleItemInList,
     clearList,
@@ -36,10 +37,8 @@ const GroceryList = () => {
     if (!activeListId) return;
     
     console.log('Inside handleIngredientsExtracted in GroceryList:', ingredients);
-    ingredients.forEach(ingredient => {
-      console.log('Adding ingredient to list:', ingredient);
-      addItemToList(activeListId, ingredient.name, ingredient.quantity, ingredient.unit);
-    });
+    // Use the new batch addition function
+    addItemsToList(activeListId, ingredients);
   };
 
   if (isLoading) {

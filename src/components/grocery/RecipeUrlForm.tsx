@@ -41,11 +41,9 @@ export const RecipeUrlForm = ({ onIngredientsExtracted }: RecipeUrlFormProps) =>
       }
 
       console.log('Before calling onIngredientsExtracted in RecipeUrlForm:', ingredients);
+      // Pass all ingredients at once
       onIngredientsExtracted(ingredients);
-      toast({
-        title: "Success",
-        description: `Found ${ingredients.length} ingredients in the recipe`,
-      });
+      
     } catch (error) {
       console.error('Error processing recipe:', error);
       toast({
