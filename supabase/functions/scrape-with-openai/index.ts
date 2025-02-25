@@ -8,6 +8,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -40,14 +41,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a webpage content extractor. Extract the main content from HTML, focusing on recipe content if present. Format with basic HTML tags where appropriate. Extract:
-            1. Page title
-            2. Main content (recipe ingredients and instructions if present)
-            Return as JSON: {"title": "string", "content": "string"}`
+            content: `You are a recipe content extractor. Extract the recipe content from HTML, focusing on recipe ingredients and instructions. Format with basic HTML tags where appropriate. Return as JSON: {"title": "Recipe Title", "content": "Recipe content with ingredients and instructions in HTML format"}`
           },
           {
             role: 'user',
-            content: `Extract content from this HTML: ${htmlContent}`
+            content: `Extract the recipe content from this HTML: ${htmlContent}`
           }
         ],
         temperature: 0.3,
@@ -55,16 +53,26 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      console.error('OpenAI API error:', await response.text());
       throw new Error('Failed to process content with OpenAI');
     }
 
     const aiResponse = await response.json();
+    console.log('OpenAI response:', aiResponse);
+
+    if (!aiResponse.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI');
+    }
+
+    // Parse the response content which should be a JSON string
     const parsedContent = JSON.parse(aiResponse.choices[0].message.content);
+    console.log('Parsed content:', parsedContent);
 
     return new Response(
       JSON.stringify({
         success: true,
-        ...parsedContent
+        content: parsedContent.content,
+        title: parsedContent.title
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
