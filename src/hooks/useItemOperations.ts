@@ -33,13 +33,35 @@ export const useItemOperations = (
       return false;
     }
 
-    if (list.items.some(item => item.name.toLowerCase() === name.trim().toLowerCase())) {
+    const normalizedName = name.trim().toLowerCase();
+    
+    // Check if the item exists with the same name AND unit
+    const existingItem = list.items.find(item => 
+      item.name.toLowerCase() === normalizedName && 
+      item.unit.toLowerCase() === unit.toLowerCase()
+    );
+
+    if (existingItem) {
+      // Update quantity instead of adding new item
+      const updatedQuantity = existingItem.quantity + quantity;
+      setLists(lists.map(l => 
+        l.id === listId 
+          ? {
+              ...l,
+              items: l.items.map(item =>
+                item.id === existingItem.id
+                  ? { ...item, quantity: updatedQuantity }
+                  : item
+              ),
+            }
+          : l
+      ));
+
       toast({
-        title: "Cannot Add Item",
-        description: "This item is already in the list",
-        variant: "destructive",
+        title: "Item Updated",
+        description: `Updated ${normalizedName} to ${updatedQuantity} ${unit}${updatedQuantity > 1 && unit === 'piece' ? 's' : ''}`,
       });
-      return false;
+      return true;
     }
 
     if (quantity <= 0) {
@@ -53,7 +75,7 @@ export const useItemOperations = (
 
     const newItem: GroceryItem = {
       id: crypto.randomUUID(),
-      name: name.trim(),
+      name: normalizedName,
       completed: false,
       quantity,
       unit,
@@ -200,3 +222,4 @@ export const useItemOperations = (
     clearList,
   };
 };
+
