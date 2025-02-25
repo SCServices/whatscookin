@@ -5,7 +5,7 @@ interface CrawlResult {
   success: boolean;
   error?: string;
   data?: {
-    content: string;
+    html: string;
     title?: string;
     url: string;
   };
@@ -39,7 +39,7 @@ export class FirecrawlService {
         limit: 1,
         scrapeOptions: {
           formats: ['markdown', 'html'],
-          elements: ['article', 'main', '.recipe-content', '.ingredients']
+          selectors: ['article', 'main', '.recipe-content', '.ingredients']
         }
       });
 
@@ -50,7 +50,7 @@ export class FirecrawlService {
       return {
         success: true,
         data: {
-          content: response.data[0].content,
+          html: response.data[0].html,
           title: response.data[0].title,
           url: url
         }

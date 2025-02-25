@@ -28,12 +28,12 @@ export const RecipeUrlForm = ({ onIngredientsExtracted }: RecipeUrlFormProps) =>
       const scrapeResult = await FirecrawlService.crawlWebsite(url);
       setProgress(50);
 
-      if (!scrapeResult.success) {
+      if (!scrapeResult.success || !scrapeResult.data) {
         throw new Error(scrapeResult.error || 'Failed to scrape recipe');
       }
 
       // Parse recipe content
-      const ingredients = await RecipeParser.extractIngredients(scrapeResult.data.content);
+      const ingredients = await RecipeParser.extractIngredients(scrapeResult.data.html);
       setProgress(100);
 
       if (ingredients.length === 0) {

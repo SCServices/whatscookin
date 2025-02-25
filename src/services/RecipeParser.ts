@@ -6,14 +6,14 @@ interface Ingredient {
 }
 
 export class RecipeParser {
-  static async extractIngredients(content: string): Promise<Ingredient[]> {
+  static async extractIngredients(html: string): Promise<Ingredient[]> {
     try {
       const response = await fetch(`${window.location.origin}/functions/v1/parse-recipe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content: html }),
       });
 
       if (!response.ok) {
