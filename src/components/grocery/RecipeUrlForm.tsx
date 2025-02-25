@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
-import { FirecrawlService } from '@/services/FirecrawlService';
 import { OpenAiScraperService } from '@/services/OpenAiScraperService';
 import { RecipeParser } from '@/services/RecipeParser';
 
@@ -18,7 +17,6 @@ export const RecipeUrlForm = ({ onIngredientsExtracted }: RecipeUrlFormProps) =>
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [useOpenAI, setUseOpenAI] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,11 +24,8 @@ export const RecipeUrlForm = ({ onIngredientsExtracted }: RecipeUrlFormProps) =>
     setProgress(20);
 
     try {
-      // Start web scraping using selected method
-      const scrapeResult = useOpenAI 
-        ? await OpenAiScraperService.scrapeWebsite(url)
-        : await FirecrawlService.crawlWebsite(url);
-      
+      // Scrape website using OpenAI
+      const scrapeResult = await OpenAiScraperService.scrapeWebsite(url);
       setProgress(50);
 
       if (!scrapeResult.success || !scrapeResult.data) {
@@ -76,17 +71,6 @@ export const RecipeUrlForm = ({ onIngredientsExtracted }: RecipeUrlFormProps) =>
             className="w-full"
             required
           />
-          <div className="flex items-center gap-2">
-            <label className="flex items-center space-x-2 text-sm">
-              <input
-                type="checkbox"
-                checked={useOpenAI}
-                onChange={(e) => setUseOpenAI(e.target.checked)}
-                className="rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <span>Use OpenAI for scraping</span>
-            </label>
-          </div>
         </div>
         {isLoading && (
           <Progress value={progress} className="w-full" />
