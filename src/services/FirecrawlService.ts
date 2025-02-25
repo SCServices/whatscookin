@@ -1,3 +1,4 @@
+
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 // Define the allowed format types
@@ -82,12 +83,10 @@ export class FirecrawlService {
       const instance = await this.getInstance();
       
       const response = await this.retry(async () => {
-        // Pass only formats in scrapeOptions, removing the selector property
         const result = await instance.crawlUrl(url, {
           limit: 1,
           scrapeOptions: {
-            formats: this.config.defaultScrapeOptions.formats,
-            // Remove any selector property for now
+            formats: this.config.defaultScrapeOptions.formats
           }
         });
 
