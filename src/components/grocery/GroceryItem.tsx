@@ -43,20 +43,17 @@ export const GroceryItem = ({
   ];
 
   return (
-    <li className="group flex flex-wrap sm:flex-nowrap items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors duration-200 animate-fade-in">
-      <div className="flex items-center gap-2 min-w-[24px]">
+    <div className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors duration-200 animate-fade-in">
+      <div className="flex items-center gap-3 min-w-[200px] flex-1">
         <Checkbox
           checked={item.completed}
           onCheckedChange={() => onToggle(item.id)}
-          className="h-5 w-5"
+          className="h-5 w-5 mt-1"
         />
-      </div>
-      
-      <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-        <div className="flex items-center gap-2 min-w-[200px]">
+        <div className="flex items-center gap-2">
           <GroceryItemModel item={item} />
           <span
-            className={`text-lg truncate ${
+            className={`text-base sm:text-lg truncate ${
               item.completed ? "line-through text-muted-foreground" : ""
             }`}
             onClick={() => setIsEditing(true)}
@@ -64,8 +61,10 @@ export const GroceryItem = ({
             {item.name}
           </span>
         </div>
-        
-        <div className="flex items-center gap-2 ml-auto">
+      </div>
+      
+      <div className="flex items-center gap-2 w-full sm:w-auto ml-8 sm:ml-0">
+        <div className="flex items-center gap-2 flex-1 sm:flex-initial">
           <Input
             type="number"
             value={quantity}
@@ -88,17 +87,17 @@ export const GroceryItem = ({
             </SelectContent>
           </Select>
         </div>
-      </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => onDelete(item.id)}
-        className="opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0"
-      >
-        <Trash className="h-5 w-5 text-destructive" />
-        <span className="sr-only">Delete {item.name}</span>
-      </Button>
-    </li>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDelete(item.id)}
+          className="shrink-0 ml-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+        >
+          <Trash className="h-5 w-5" />
+          <span className="sr-only">Delete {item.name}</span>
+        </Button>
+      </div>
+    </div>
   );
 };
