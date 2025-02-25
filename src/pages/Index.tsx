@@ -2,6 +2,7 @@
 import GroceryList from "@/components/GroceryList";
 import GroceryBackground from "@/components/GroceryBackground";
 import { CreateNewListDialog } from "@/components/grocery/CreateNewListDialog";
+import { ListSelector } from "@/components/grocery/ListSelector";
 
 const Index = () => {
   return (
@@ -22,12 +23,13 @@ const Index = () => {
       {/* Main Content */}
       <main className="container max-w-6xl mx-auto p-4 sm:p-6 md:p-8 animate-fade-in relative" style={{ animationDelay: "200ms" }}>
         <div className="grid grid-cols-1 gap-6">
-          <GroceryList />
-          
-          {/* Quick Actions */}
-          <div className="flex flex-wrap justify-center gap-4 mt-4">
+          {/* List Management */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <ListSelector />
             <CreateNewListDialog />
           </div>
+          
+          <GroceryList />
         </div>
       </main>
     </div>
@@ -35,3 +37,4 @@ const Index = () => {
 };
 
 export default Index;
+
