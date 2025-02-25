@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import type { GroceryItem } from "@/types/grocery";
+import type { GroceryItem, UnitType } from "@/types/grocery";
 
 const STORAGE_KEY = "grocery-list-items";
 const MAX_ITEMS = 100; // Reasonable limit for a grocery list
@@ -90,6 +90,8 @@ export const useGroceryStore = () => {
       id: crypto.randomUUID(),
       name: name.trim(),
       completed: false,
+      quantity: 1, // Default quantity
+      unit: 'piece' as UnitType // Default unit
     };
 
     setItems([...items, item]);
