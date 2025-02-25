@@ -1,3 +1,4 @@
+
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 // Define the allowed format types
@@ -18,7 +19,7 @@ interface FirecrawlConfig {
   apiKey: string;
   defaultScrapeOptions: {
     formats: FirecrawlFormat[];
-    selector: string; // Updated to use 'selector' which is the correct parameter according to docs
+    cssSelector?: string; // Updated to use cssSelector which is the correct parameter
   };
   maxRetries: number;
   retryDelay: number;
@@ -31,7 +32,7 @@ export class FirecrawlService {
     apiKey: '',
     defaultScrapeOptions: {
       formats: ['markdown', 'html'],
-      selector: 'article, main, .recipe-content, .ingredients' // CSS selectors as a comma-separated string
+      cssSelector: 'article, main, .recipe-content, .ingredients' // Use cssSelector instead of selector
     },
     maxRetries: 3,
     retryDelay: 1000
@@ -83,7 +84,7 @@ export class FirecrawlService {
           limit: 1,
           scrapeOptions: {
             formats: this.config.defaultScrapeOptions.formats,
-            selector: this.config.defaultScrapeOptions.selector // Using 'selector' as per the documentation
+            cssSelector: this.config.defaultScrapeOptions.cssSelector // Using cssSelector instead of selector
           }
         });
 
