@@ -1,4 +1,3 @@
-
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 // Define the allowed format types
@@ -52,15 +51,9 @@ export class FirecrawlService {
     return this.instance;
   }
 
-  static saveApiKey(apiKey: string): void {
-    localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
-    // Reset instance to force new initialization with new API key
-    this.instance = null;
-    this.config.apiKey = apiKey;
-  }
-
   static getApiKey(): string | null {
-    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
+    // First try to get from environment, then fallback to localStorage
+    return this.config.apiKey || localStorage.getItem(this.API_KEY_STORAGE_KEY);
   }
 
   private static async retry<T>(
@@ -86,7 +79,8 @@ export class FirecrawlService {
         const result = await instance.crawlUrl(url, {
           limit: 1,
           scrapeOptions: {
-            formats: this.config.defaultScrapeOptions.formats
+            formats: this.config.defaultScrapeOptions.formats,
+            selector: this.config.defaultScrapeOptions.selector
           }
         });
 
