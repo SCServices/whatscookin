@@ -14,13 +14,13 @@ interface CrawlResult {
   };
 }
 
-// Update to match the expected interface from the library
+// Update our internal configuration type
 interface FirecrawlConfig {
   apiKey: string;
   defaultScrapeOptions: {
     formats: FirecrawlFormat[];
-    // Remove selectors from here since it doesn't seem to be part of CrawlScrapeOptions
-    cssSelector?: string; // Add this as a potential alternative
+    selector?: string; // Store as a single selector string
+    contentSelectors?: string[]; // Keep array version for our internal use
   };
   maxRetries: number;
   retryDelay: number;
@@ -33,7 +33,8 @@ export class FirecrawlService {
     apiKey: '',
     defaultScrapeOptions: {
       formats: ['markdown', 'html'],
-      cssSelector: 'article, main, .recipe-content, .ingredients' // Changed from array to comma-separated string
+      selector: 'article, main, .recipe-content, .ingredients',
+      contentSelectors: ['article', 'main', '.recipe-content', '.ingredients']
     },
     maxRetries: 3,
     retryDelay: 1000
@@ -81,11 +82,12 @@ export class FirecrawlService {
       const instance = await this.getInstance();
       
       const response = await this.retry(async () => {
+        // Pass only formats in scrapeOptions, removing the selector property
         const result = await instance.crawlUrl(url, {
           limit: 1,
           scrapeOptions: {
             formats: this.config.defaultScrapeOptions.formats,
-            cssSelector: this.config.defaultScrapeOptions.cssSelector
+            // Remove any selector property for now
           }
         });
 
