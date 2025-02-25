@@ -29,9 +29,10 @@ const GROCERY_MODELS: Record<string, {
 
 interface GroceryItemModelProps {
   item: GroceryItem;
+  className?: string;  // Make className optional
 }
 
-export const GroceryItemModel: React.FC<GroceryItemModelProps> = ({ item }) => {
+export const GroceryItemModel: React.FC<GroceryItemModelProps> = ({ item, className }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -101,7 +102,7 @@ export const GroceryItemModel: React.FC<GroceryItemModelProps> = ({ item }) => {
   return (
     <div 
       ref={mountRef} 
-      className="w-12 h-12 inline-block mr-2"
+      className={`w-12 h-12 inline-block mr-2 ${className || ''}`}
       onMouseEnter={() => {
         if (meshRef.current) {
           meshRef.current.scale.multiplyScalar(1.2);
@@ -115,3 +116,4 @@ export const GroceryItemModel: React.FC<GroceryItemModelProps> = ({ item }) => {
     />
   );
 };
+
