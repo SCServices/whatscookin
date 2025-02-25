@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { GroceryListLoading } from "./grocery/GroceryListLoading";
 import { EmptyGroceryList } from "./grocery/EmptyGroceryList";
 import { GroceryItem } from "./grocery/GroceryItem";
+import { RecipeUrlForm } from "./grocery/RecipeUrlForm";
 import { useGroceryLists } from "@/hooks/useGroceryLists";
 
 const GroceryList = () => {
@@ -31,6 +32,14 @@ const GroceryList = () => {
     }
   };
 
+  const handleIngredientsExtracted = (ingredients: Array<{ name: string; quantity: number; unit: string }>) => {
+    if (!activeListId) return;
+    
+    ingredients.forEach(ingredient => {
+      addItemToList(activeListId, ingredient.name, ingredient.quantity, ingredient.unit);
+    });
+  };
+
   if (isLoading) {
     return <GroceryListLoading />;
   }
@@ -45,6 +54,8 @@ const GroceryList = () => {
         <CardTitle className="text-2xl font-bold">{activeList.name}</CardTitle>
       </CardHeader>
       <CardContent>
+        <RecipeUrlForm onIngredientsExtracted={handleIngredientsExtracted} />
+        
         <div className="flex gap-2 mb-4">
           <Input
             type="text"
@@ -100,4 +111,3 @@ const GroceryList = () => {
 };
 
 export default GroceryList;
-
