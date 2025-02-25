@@ -43,15 +43,15 @@ export const GroceryItem = ({
   ];
 
   return (
-    <div className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors duration-200 animate-fade-in">
-      <div className="flex items-center gap-3 min-w-[200px] flex-1">
+    <div className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors duration-200 animate-fade-in w-full max-w-full overflow-hidden">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         <Checkbox
           checked={item.completed}
           onCheckedChange={() => onToggle(item.id)}
-          className="h-5 w-5 mt-1"
+          className="h-5 w-5 shrink-0"
         />
-        <div className="flex items-center gap-2">
-          <GroceryItemModel item={item} />
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <GroceryItemModel item={item} className="shrink-0" />
           <span
             className={`text-base sm:text-lg truncate ${
               item.completed ? "line-through text-muted-foreground" : ""
@@ -63,19 +63,19 @@ export const GroceryItem = ({
         </div>
       </div>
       
-      <div className="flex items-center gap-2 w-full sm:w-auto ml-8 sm:ml-0">
-        <div className="flex items-center gap-2 flex-1 sm:flex-initial">
+      <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-2">
           <Input
             type="number"
             value={quantity}
             onChange={(e) => handleQuantityChange(e.target.value)}
-            className="w-20 text-right"
+            className="w-20 text-right shrink-0"
             min="0.1"
             step="0.1"
           />
           
           <Select value={unit} onValueChange={handleUnitChange}>
-            <SelectTrigger className="w-24">
+            <SelectTrigger className="w-24 shrink-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -92,7 +92,7 @@ export const GroceryItem = ({
           variant="ghost"
           size="icon"
           onClick={() => onDelete(item.id)}
-          className="shrink-0 ml-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
         >
           <Trash className="h-5 w-5" />
           <span className="sr-only">Delete {item.name}</span>
