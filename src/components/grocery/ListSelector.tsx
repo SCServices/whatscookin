@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { useGroceryLists } from "@/hooks/useGroceryLists";
 import { RenameListDialog } from "./RenameListDialog";
+import { ShareListDialog } from "./ShareListDialog";
 
 export function ListSelector() {
   const { lists, activeListId, setActiveListId, isLoading } = useGroceryLists();
@@ -35,10 +36,13 @@ export function ListSelector() {
         </SelectContent>
       </Select>
       {activeListId && (
-        <RenameListDialog
-          listId={activeListId}
-          currentName={lists.find(list => list.id === activeListId)?.name || ""}
-        />
+        <>
+          <ShareListDialog listId={activeListId} />
+          <RenameListDialog
+            listId={activeListId}
+            currentName={lists.find(list => list.id === activeListId)?.name || ""}
+          />
+        </>
       )}
     </div>
   );
