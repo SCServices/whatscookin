@@ -1,103 +1,25 @@
-import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import type { GroceryList, GroceryItem } from "@/types/grocery";
 
-const STORAGE_KEY = "grocery-lists";
-const MAX_LISTS = 20;
-const MIN_LIST_NAME_LENGTH = 3;
-const MAX_LIST_NAME_LENGTH = 50;
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useListStorage } from "./useListStorage";
+import { useListValidation } from "./useListValidation";
+import { useListSharing } from "./useListSharing";
+import type { GroceryItem, GroceryList } from "@/types/grocery";
 
 export const useGroceryLists = () => {
-  const [lists, setLists] = useState<GroceryList[]>([]);
+  const { lists, setLists, isLoading } = useListStorage();
   const [activeListId, setActiveListId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { validateListName } = useListValidation(lists);
+  const { shareList, unshareList, getSharedList } = useListSharing(lists, setLists);
   const { toast } = useToast();
 
-  // Load lists from localStorage on component mount
-  useEffect(() => {
-    const loadLists = () => {
-      try {
-        const savedLists = localStorage.getItem(STORAGE_KEY);
-        if (savedLists) {
-          const parsedLists = JSON.parse(savedLists);
-          if (!Array.isArray(parsedLists)) {
-            throw new Error("Invalid data format in storage");
-          }
-          setLists(parsedLists);
-          // Set active list to the most recently created list
-          if (parsedLists.length > 0) {
-            const mostRecent = parsedLists.reduce((prev, current) => 
-              current.createdAt > prev.createdAt ? current : prev
-            );
-            setActiveListId(mostRecent.id);
-          }
-        } else {
-          // Create default list if no lists exist
-          const defaultList: GroceryList = {
-            id: crypto.randomUUID(),
-            name: "My Grocery List",
-            items: [],
-            isShared: false,
-            createdAt: Date.now(),
-          };
-          setLists([defaultList]);
-          setActiveListId(defaultList.id);
-        }
-      } catch (error) {
-        console.error("Error loading lists:", error);
-        toast({
-          title: "Error Loading Lists",
-          description: "There was a problem loading your grocery lists. Starting fresh.",
-          variant: "destructive",
-        });
-        const defaultList: GroceryList = {
-          id: crypto.randomUUID(),
-          name: "My Grocery List",
-          items: [],
-          isShared: false,
-          createdAt: Date.now(),
-        };
-        setLists([defaultList]);
-        setActiveListId(defaultList.id);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    setTimeout(loadLists, 500);
-  }, [toast]);
-
-  // Save lists to localStorage whenever they change
-  useEffect(() => {
-    if (!isLoading) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
-      } catch (error) {
-        console.error("Error saving lists:", error);
-        toast({
-          title: "Save Error",
-          description: "Failed to save your changes. Your changes may be lost when you reload.",
-          variant: "destructive",
-        });
-      }
-    }
-  }, [lists, isLoading, toast]);
-
-  const validateListName = (name: string): string | null => {
-    if (!name || name.trim().length < MIN_LIST_NAME_LENGTH) {
-      return `List name must be at least ${MIN_LIST_NAME_LENGTH} characters`;
-    }
-    if (name.trim().length > MAX_LIST_NAME_LENGTH) {
-      return `List name must be less than ${MAX_LIST_NAME_LENGTH} characters`;
-    }
-    if (lists.length >= MAX_LISTS) {
-      return `Cannot create more than ${MAX_LISTS} lists`;
-    }
-    if (lists.some(list => list.name.toLowerCase() === name.trim().toLowerCase())) {
-      return "A list with this name already exists";
-    }
-    return null;
-  };
+  // Set initial active list
+  if (!activeListId && lists.length > 0 && !isLoading) {
+    const mostRecent = lists.reduce((prev, current) => 
+      current.createdAt > prev.createdAt ? current : prev
+    );
+    setActiveListId(mostRecent.id);
+  }
 
   const createList = (name: string): boolean => {
     const error = validateListName(name);
@@ -173,7 +95,6 @@ export const useGroceryLists = () => {
       return;
     }
 
-    // Don't allow deleting the last list
     if (lists.length === 1) {
       toast({
         title: "Cannot Delete List",
@@ -185,7 +106,6 @@ export const useGroceryLists = () => {
 
     setLists(lists.filter(list => list.id !== id));
     
-    // If we're deleting the active list, switch to the most recent list
     if (id === activeListId) {
       const remainingLists = lists.filter(list => list.id !== id);
       const mostRecent = remainingLists.reduce((prev, current) => 
@@ -202,61 +122,6 @@ export const useGroceryLists = () => {
 
   const getActiveList = () => {
     return lists.find(list => list.id === activeListId) || null;
-  };
-
-  const shareList = (id: string): string | null => {
-    const list = lists.find(l => l.id === id);
-    if (!list) {
-      toast({
-        title: "Error",
-        description: "List not found",
-        variant: "destructive",
-      });
-      return null;
-    }
-
-    if (!list.shareId) {
-      const shareId = crypto.randomUUID();
-      setLists(lists.map(l => 
-        l.id === id ? { ...l, isShared: true, shareId } : l
-      ));
-      toast({
-        title: "List Shared",
-        description: "A sharing link has been generated for this list",
-      });
-      return shareId;
-    }
-
-    return list.shareId;
-  };
-
-  const unshareList = (id: string): boolean => {
-    const list = lists.find(l => l.id === id);
-    if (!list) {
-      toast({
-        title: "Error",
-        description: "List not found",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    if (!list.isShared) {
-      return false;
-    }
-
-    setLists(lists.map(l => 
-      l.id === id ? { ...l, isShared: false, shareId: undefined } : l
-    ));
-    toast({
-      title: "List Unshared",
-      description: "The list is no longer shared",
-    });
-    return true;
-  };
-
-  const getSharedList = (shareId: string): GroceryList | null => {
-    return lists.find(list => list.shareId === shareId) || null;
   };
 
   const addItemToList = (listId: string, name: string): boolean => {
