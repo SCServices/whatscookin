@@ -24,7 +24,7 @@ const Index = () => {
       <main className="container max-w-6xl mx-auto p-4 sm:p-6 md:p-8 animate-fade-in relative" style={{ animationDelay: "200ms" }}>
         <div className="grid grid-cols-1 gap-6">
           {/* List Management */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col items-center gap-4">
             <ListSelector />
             <CreateNewListDialog />
           </div>
@@ -37,4 +37,3 @@ const Index = () => {
 };
 
 export default Index;
-
