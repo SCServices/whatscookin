@@ -7,6 +7,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Basic HTML cleaning function to reduce tokens
+function cleanHtml(html: string): string {
+  // Remove scripts, styles, and comments
+  let cleaned = html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    // Remove header, footer, nav, and other non-content sections
+    .replace(/<header\b[^<]*(?:(?!<\/header>)<[^<]*)*<\/header>/gi, '')
+    .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, '')
+    .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, '')
+    .replace(/<aside\b[^<]*(?:(?!<\/aside>)<[^<]*)*<\/aside>/gi, '');
+
+  // Try to find the main content area
+  const mainContentMatch = cleaned.match(/<main\b[^<]*(?:(?!<\/main>)<[^<]*)*<\/main>/i) ||
+    cleaned.match(/<article\b[^<]*(?:(?!<\/article>)<[^<]*)*<\/article>/i) ||
+    cleaned.match(/<div[^>]*?(content|recipe)[^>]*>[\s\S]*?<\/div>/i);
+
+  if (mainContentMatch) {
+    cleaned = mainContentMatch[0];
+  }
+
+  // Remove all attributes except for basic structural ones
+  cleaned = cleaned.replace(/<([a-z][a-z0-9]*)[^>]*?(class="[^"]*?recipe[^"]*")[^>]*?>/gi, '<$1 $2>') // Keep recipe-related classes
+    .replace(/<([a-z][a-z0-9]*)[^>]*>/gi, '<$1>');
+
+  return cleaned;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -27,7 +56,11 @@ serve(async (req) => {
 
     // First, fetch the webpage content
     const websiteResponse = await fetch(url);
-    const htmlContent = await websiteResponse.text();
+    let htmlContent = await websiteResponse.text();
+
+    // Clean and reduce HTML content
+    htmlContent = cleanHtml(htmlContent);
+    console.log('Cleaned HTML length:', htmlContent.length);
 
     // Use OpenAI to extract relevant content
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
